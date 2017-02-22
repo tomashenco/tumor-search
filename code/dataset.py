@@ -41,10 +41,10 @@ class TrainDataset(object):
         patients_list = [folder for folder in os.listdir(path_to_training_set)
                          if os.path.isdir(os.path.join(path_to_training_set, folder))]
 
-        for patient in patients_list:
-            index = self.read_test_structure(os.path.join(path_to_training_set, patient, patient_structure_file), alias)
+        for single_patient in patients_list:
+            index = self.read_test_structure(os.path.join(path_to_training_set, single_patient, patient_structure_file), alias)
 
-            patient_path = os.path.join(path_to_training_set, patient)
+            patient_path = os.path.join(path_to_training_set, single_patient)
             image_paths_unsorted = [path for path in os.listdir(os.path.join(patient_path, patient_pngs))]
             image_paths = sorted(image_paths_unsorted, key=my_key)
 
@@ -63,9 +63,11 @@ class TrainDataset(object):
 
             yield Patient(patient_path, contours_paths, image_paths)
 
+    def get_max_size(self):
+        return max([patient.get_images_length() for patient in self.patients])
+
 
 train_dataset = TrainDataset()
-# for patient in train_dataset.patients:
-#     print patient.main_path
-#     print patient.contours
-#     print patient.images
+for patient in train_dataset.patients:
+    for contour in patient.iterate_data(train_dataset.get_max_size()):
+        print contour

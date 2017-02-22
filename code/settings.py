@@ -6,3 +6,6 @@ patient_structure_file = 'structures.dat'
 patient_auxiliary = 'auxiliary'
 patient_contours = 'contours'
 patient_pngs = 'pngs'
+
+image_size = 512
+classes = 2
