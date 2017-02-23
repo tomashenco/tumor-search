@@ -7,5 +7,7 @@ patient_auxiliary = 'auxiliary'
 patient_contours = 'contours'
 patient_pngs = 'pngs'
 
+ct_tags = {'scale': '(0028.0030)', 'centre': '(0020.0032)'}
+
 image_size = 512
 classes = 2
