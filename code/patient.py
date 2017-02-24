@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 
-from settings import patient_contours, patient_pngs, image_size, classes
+from settings import patient_contours, patient_pngs, image_size, num_classes
 
 
 class Patient(object):
@@ -18,7 +18,7 @@ class Patient(object):
     def iterate_data(self, max_size):
         # Initialise outputs
         inputs = np.empty((max_size, 1, image_size, image_size), dtype=np.float32)
-        targets = np.empty((max_size, classes, image_size, image_size), dtype=np.float32)
+        targets = np.empty((max_size, num_classes, image_size, image_size), dtype=np.float32)
 
         inputs.fill(0.0)
         targets.fill(0.0)
