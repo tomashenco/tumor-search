@@ -1,8 +1,11 @@
 import os
+import numpy as np
+from random import choice
 
 from patient import Patient
+from cnn import target_size
 from settings import main_structures_file, main_structure_name, path_to_training_set, patient_structure_file, \
-    patient_contours, patient_pngs, patient_auxiliary, ct_tags
+    patient_contours, patient_pngs, patient_auxiliary, ct_tags, image_size, num_classes, epoch_size, batch_size
 
 
 def my_key(s):
@@ -11,7 +14,7 @@ def my_key(s):
 
 class TrainDataset(object):
     def __init__(self):
-        self.patients = [single_patient for single_patient in self.prepare_patients()]
+        self.__patients = [single_patient for single_patient in self.prepare_patients()]
 
     @staticmethod
     def get_aliases():
@@ -110,10 +113,20 @@ class TrainDataset(object):
 
             yield Patient(patient_path, contours_paths, image_paths, tags)
 
-    def get_max_size(self):
+    def iterate_data(self):
         """
-        Returns maximum amount of images from all of the patients
+        Iterates minibatches for training of image + mask
 
-        :return: single integer
+        :yield: tuple of input and target matrices
         """
-        return max([single_patient.get_images_length() for single_patient in self.patients])
+        for i in xrange(epoch_size):
+            # Initialise outputs
+            inputs = np.zeros((batch_size, 1, image_size, image_size), dtype=np.float32)
+            targets = np.zeros((batch_size, num_classes, target_size(image_size), target_size(image_size)),
+                               dtype=np.float32)
+
+            for index in xrange(batch_size):
+                patient = choice(self.__patients)
+                inputs[index], targets[index] = patient.get_random_data()
+
+            yield inputs, targets

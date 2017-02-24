@@ -1,8 +1,10 @@
 import os
 import cv2
 import numpy as np
+from random import randint
 
-from settings import patient_contours, patient_pngs, image_size, num_classes
+from cnn import target_size
+from settings import patient_contours, patient_pngs, image_size
 
 
 class Patient(object):
@@ -10,31 +12,27 @@ class Patient(object):
         self.__main_path = path
         self.__contours = contours
         self.__images = images
-        self.tags = tags
+        self.__tags = tags
 
-    def get_images_length(self):
-        return len(self.__images)
+    def get_random_data(self):
+        """
+        Prepare a pair of image + mask
 
-    def iterate_data(self, max_size):
-        # Initialise outputs
-        inputs = np.empty((max_size, 1, image_size, image_size), dtype=np.float32)
-        targets = np.empty((max_size, num_classes, image_size, image_size), dtype=np.float32)
+        :return: tuple
+        """
+        index = randint(0, len(self.__images))
 
-        inputs.fill(0.0)
-        targets.fill(0.0)
+        image_name = self.__images[index]
+        image = self.prepare_image(os.path.join(self.__main_path, patient_pngs, image_name))
 
-        for index, image_name in enumerate(self.__images):
-            inputs[index] = self.prepare_image(os.path.join(self.__main_path, patient_pngs, image_name))
+        contour_name = self.__contours[index]
+        tag = self.__tags[index]
+        if contour_name is not None:
+            mask = self.prepare_mask(os.path.join(self.__main_path, patient_contours, contour_name), tag)
+        else:
+            mask = np.zeros((target_size(image_size), target_size(image_size)), dtype=float)
 
-        for index, (contour_name, tag) in enumerate(zip(self.__contours, self.tags)):
-            if contour_name is not None:
-                mask = self.prepare_mask(os.path.join(self.__main_path, patient_contours, contour_name), tag)
-            else:
-                mask = np.zeros((512, 512), dtype=float)
-
-            targets[index] = mask
-
-        yield inputs, targets
+        return image, mask
 
     @staticmethod
     def prepare_image(path):
@@ -46,6 +44,13 @@ class Patient(object):
 
     @staticmethod
     def prepare_mask(path, tag):
+        """
+        Converts contour to mask
+
+        :param path: path to the contour file
+        :param tag: appropriate tags for the CT scan
+        :return:
+        """
         with open(path, 'r') as f:
             tumor_contours = f.read().strip().split()
 
@@ -61,5 +66,7 @@ class Patient(object):
 
             contour = contour_2d.reshape((-1, 2)).astype(int)
             cv2.fillConvexPoly(mask, contour, 1.0)
+
+        mask = cv2.resize(mask, (target_size(image_size), target_size(image_size)), interpolation=cv2.INTER_AREA)
 
         return mask

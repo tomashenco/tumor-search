@@ -12,7 +12,7 @@ conv_4_filters = 1024
 network_scale = 8
 total_padding = 32
 
-# receptive_field_size = 72
+receptive_field_size = 72
 
 
 def softmax4d(x):

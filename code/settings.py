@@ -12,4 +12,5 @@ ct_tags = {'scale': '(0028.0030)', 'centre': '(0020.0032)'}
 image_size = 512
 num_classes = 2
 num_epochs = 1
+epoch_size = 1
 batch_size = 1
