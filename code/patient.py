@@ -7,7 +7,7 @@ from cnn import target_size
 from settings import patient_contours, patient_pngs, image_size
 
 
-class Patient(object):
+class Patient:
     def __init__(self, path, contours, images, tags):
         self.__main_path = path
         self.__contours = contours
@@ -33,6 +33,22 @@ class Patient(object):
             mask = np.zeros((target_size(image_size), target_size(image_size)), dtype=float)
 
         return image, mask
+
+    def get_all_data(self):
+        """
+        Prepare all pairs of image + mask
+
+        :yield: tuple
+        """
+
+        for image_name, contour_name, tag in zip(self.__images, self.__contours, self.__tags):
+            image = self.prepare_image(os.path.join(self.__main_path, patient_pngs, image_name))
+            if contour_name is not None:
+                mask = self.prepare_mask(os.path.join(self.__main_path, patient_contours, contour_name), tag)
+            else:
+                mask = np.zeros((target_size(image_size), target_size(image_size)), dtype=float)
+
+            yield image, mask
 
     @staticmethod
     def prepare_image(path):

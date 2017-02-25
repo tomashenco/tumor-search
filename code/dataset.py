@@ -1,20 +1,19 @@
 import os
-import numpy as np
-from random import choice
 
 from patient import Patient
-from cnn import target_size
-from settings import main_structures_file, main_structure_name, path_to_training_set, patient_structure_file, \
-    patient_contours, patient_pngs, patient_auxiliary, ct_tags, image_size, num_classes, epoch_size, batch_size
+
+from settings import main_structures_file, main_structure_name, patient_structure_file, patient_contours, \
+    patient_pngs, patient_auxiliary, ct_tags
 
 
 def my_key(s):
     return int(s.split('.')[0])
 
 
-class TrainDataset(object):
-    def __init__(self):
-        self.__patients = [single_patient for single_patient in self.prepare_patients()]
+class Dataset:
+    def __init__(self, path):
+        self.__main_path = path
+        self.patients = [single_patient for single_patient in self.prepare_patients()]
 
     @staticmethod
     def get_aliases():
@@ -82,14 +81,14 @@ class TrainDataset(object):
         :yield: single Patient object
         """
         alias = self.get_aliases()
-        patients_list = [folder for folder in os.listdir(path_to_training_set)
-                         if os.path.isdir(os.path.join(path_to_training_set, folder))]
+        patients_list = [folder for folder in os.listdir(self.__main_path)
+                         if os.path.isdir(os.path.join(self.__main_path, folder))]
 
         for single_patient in patients_list:
-            index = self.read_test_structure(os.path.join(path_to_training_set, single_patient, patient_structure_file),
+            index = self.read_test_structure(os.path.join(self.__main_path, single_patient, patient_structure_file),
                                              alias)
 
-            patient_path = os.path.join(path_to_training_set, single_patient)
+            patient_path = os.path.join(self.__main_path, single_patient)
 
             # Return image, contour paths and CT tags sorted and of the same length for easier loading
             image_paths = [path for path in sorted(os.listdir(os.path.join(patient_path, patient_pngs)), key=my_key)]
@@ -112,27 +111,3 @@ class TrainDataset(object):
             assert(len(tags) == len(image_paths))
 
             yield Patient(patient_path, contours_paths, image_paths, tags)
-
-    def iterate_data(self):
-        """
-        Iterates minibatches for training of image + mask
-
-        :yield: tuple of input and target matrices
-        """
-        inputs = np.empty((batch_size, 1, image_size, image_size), dtype=np.float32)
-        targets = np.empty((batch_size, num_classes, 2, target_size(image_size), target_size(image_size)),
-                           dtype=np.float32)
-
-        for i in xrange(epoch_size):
-            # Initialise outputs
-            inputs.fill(0.0)
-            targets.fill(0.0)
-
-            for index in xrange(batch_size):
-                patient = choice(self.__patients)
-                image, mask = patient.get_random_data()
-                inputs[index] = image
-                targets[index, 0, 0] = mask
-                targets[index, 0, 1] = 1.0 - mask
-
-            yield inputs, targets

@@ -7,12 +7,14 @@ import lasagne
 import time
 import os
 
-from dataset import TrainDataset
+from train_dataset import TrainDataset
+from test_dataset import TestDataset
 import cnn
-from settings import num_epochs, num_classes, image_size, epoch_size, batch_size, models_path
+from settings import num_epochs, num_classes, image_size, epoch_size, batch_size, models_path, path_to_training_set, \
+    path_to_testing_set
 
 
-class Logger(object):
+class Logger:
     def __init__(self):
         self.terminal = sys.stdout
         self.log = open('logfile.txt', 'a')
@@ -37,7 +39,8 @@ def categorical_crossentropy_logdomain(log_predictions, targets):
 def train(weight_src, learning_rate):
     # Loading train dataset
     print 'Loading datasets'
-    train_dataset = TrainDataset()
+    train_dataset = TrainDataset(path_to_training_set)
+    test_dataset = TestDataset(path_to_testing_set)
 
     # Prepare Theano variables for inputs and targets
     ftensor5 = t.TensorType('float32', (False,) * 5)
