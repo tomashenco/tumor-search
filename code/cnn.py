@@ -105,6 +105,7 @@ def empty_cnn(num_classes, test_mode, batch_size=None, image_size=None, input_va
         network, num_filters=num_classes, filter_size=(1, 1), nonlinearity=lasagne.nonlinearities.identity)
 
     network = lasagne.layers.ReshapeLayer(network, ([0], num_classes / 2, 2, [2], [3]))
+
     if test_mode:
         network = lasagne.layers.NonlinearityLayer(network, softmax)
     else:

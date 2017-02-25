@@ -20,7 +20,7 @@ class Patient(object):
 
         :return: tuple
         """
-        index = randint(0, len(self.__images))
+        index = randint(0, len(self.__images) - 1)
 
         image_name = self.__images[index]
         image = self.prepare_image(os.path.join(self.__main_path, patient_pngs, image_name))

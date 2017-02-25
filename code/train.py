@@ -5,10 +5,11 @@ import theano
 import theano.tensor as t
 import lasagne
 import time
+import os
 
 from dataset import TrainDataset
 import cnn
-from settings import num_epochs, num_classes, image_size, epoch_size, batch_size
+from settings import num_epochs, num_classes, image_size, epoch_size, batch_size, models_path
 
 
 class Logger(object):
@@ -39,13 +40,14 @@ def train(weight_src, learning_rate):
     train_dataset = TrainDataset()
 
     # Prepare Theano variables for inputs and targets
+    ftensor5 = t.TensorType('float32', (False,) * 5)
     input_var = t.tensor4('inputs')
-    target_var = t.tensor4('targets')
+    target_var = ftensor5('targets')
 
     # Build CNN model
     print 'Building model and compiling functions'
     if weight_src is None:
-        network = cnn.empty_cnn(num_classes, False, batch_size, image_size, input_var)
+        network = cnn.empty_cnn(num_classes * 2, False, batch_size, image_size, input_var)
     else:
         network = cnn.file_cnn(weight_src, False, batch_size, image_size, input_var, num_classes)
     prediction = lasagne.layers.get_output(network)
@@ -72,7 +74,7 @@ def train(weight_src, learning_rate):
         for inputs, targets in train_dataset.iterate_data():
             train_err += train_fn(inputs, targets)
 
-        print 'Training took %.3f s loss: %.5f' % (time.time() - train_time, train_err / epoch_size)
+        print 'Training took %.3f s loss: %f' % (time.time() - train_time, train_err / epoch_size)
 
         save('snapshot', lasagne.layers.get_all_param_values(network))
         save('snapshot_' + str(epoch).zfill(4), lasagne.layers.get_all_param_values(network))
@@ -80,7 +82,7 @@ def train(weight_src, learning_rate):
 
 def save(base_filename, params):
     model_filename = base_filename + '.npz'
-    np.savez(model_filename, params)
+    np.savez(os.path.join(models_path, model_filename), params)
 
 
 if __name__ == '__main__':
