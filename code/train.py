@@ -10,6 +10,8 @@ import os
 from train_dataset import TrainDataset
 from test_dataset import TestDataset
 import cnn
+from test import test
+
 from settings import num_epochs, num_classes, image_size, epoch_size, batch_size, models_path, path_to_training_set, \
     path_to_testing_set
 
@@ -81,6 +83,11 @@ def train(weight_src, learning_rate):
 
         save('snapshot', lasagne.layers.get_all_param_values(network))
         save('snapshot_' + str(epoch).zfill(4), lasagne.layers.get_all_param_values(network))
+
+        # Test the model
+        network_model = cnn.pretrained_cnn(lasagne.layers.get_all_param_values(network), True)
+        print 'Calculating score'
+        test(network_model, test_dataset)
 
 
 def save(base_filename, params):

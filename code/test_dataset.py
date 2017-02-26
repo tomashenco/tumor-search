@@ -1,4 +1,8 @@
+import numpy as np
+
 from dataset import Dataset
+
+from settings import num_classes, image_size
 
 
 class TestDataset(Dataset):
@@ -11,6 +15,8 @@ class TestDataset(Dataset):
 
         :yield: tuple
         """
+        input_mat = np.empty((1, 1, image_size, image_size), dtype=np.float32)
         for patient in self.patients:
             for image, mask in patient.get_all_data():
-                yield image, mask
+                input_mat[0] = image
+                yield input_mat, mask

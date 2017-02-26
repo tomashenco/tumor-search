@@ -32,6 +32,8 @@ class Patient:
         else:
             mask = np.zeros((target_size(image_size), target_size(image_size)), dtype=float)
 
+        mask = cv2.resize(mask, (target_size(image_size), target_size(image_size)), interpolation=cv2.INTER_AREA)
+
         return image, mask
 
     def get_all_data(self):
@@ -46,7 +48,7 @@ class Patient:
             if contour_name is not None:
                 mask = self.prepare_mask(os.path.join(self.__main_path, patient_contours, contour_name), tag)
             else:
-                mask = np.zeros((target_size(image_size), target_size(image_size)), dtype=float)
+                mask = np.zeros((image_size, image_size), dtype=float)
 
             yield image, mask
 
@@ -82,7 +84,5 @@ class Patient:
 
             contour = contour_2d.reshape((-1, 2)).astype(int)
             cv2.fillConvexPoly(mask, contour, 1.0)
-
-        mask = cv2.resize(mask, (target_size(image_size), target_size(image_size)), interpolation=cv2.INTER_AREA)
 
         return mask
