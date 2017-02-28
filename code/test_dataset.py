@@ -2,7 +2,7 @@ import numpy as np
 
 from dataset import Dataset
 
-from settings import num_classes, image_size
+from settings import image_size
 
 
 class TestDataset(Dataset):

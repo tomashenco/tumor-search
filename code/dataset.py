@@ -13,6 +13,7 @@ def my_key(s):
 class Dataset:
     def __init__(self, path):
         self.__main_path = path
+        self.__read_contours = True
         self.patients = [single_patient for single_patient in self.prepare_patients()]
 
     @staticmethod
@@ -29,8 +30,7 @@ class Dataset:
         aliases = [line.strip().split('|') for line in whole_file if main_structure_name in line][0]
         return aliases
 
-    @staticmethod
-    def read_test_structure(file_name, aliases):
+    def read_test_structure(self, file_name, aliases):
         """
         Get appropriate index for contour files
 
@@ -38,8 +38,12 @@ class Dataset:
         :param aliases: list of strings
         :return: single integer
         """
-        with open(file_name, 'r') as f:
-            whole_file = f.readlines()
+        try:
+            with open(file_name, 'r') as f:
+                whole_file = f.readlines()
+        except IOError:
+            self.__read_contours = False
+            return None
 
         # One line in form of <body|Esophagus|lung|radiomics_gtv>
         processed = whole_file[0].strip().split('|')
@@ -93,21 +97,25 @@ class Dataset:
             # Return image, contour paths and CT tags sorted and of the same length for easier loading
             image_paths = [path for path in sorted(os.listdir(os.path.join(patient_path, patient_pngs)), key=my_key)]
 
-            contours_paths = [path for path in sorted(os.listdir(os.path.join(patient_path, patient_contours)),
-                                                      key=my_key) if int(path.split('.')[1]) == index]
+            if self.__read_contours:
+                contours_paths = [path for path in sorted(os.listdir(os.path.join(patient_path, patient_contours)),
+                                                          key=my_key) if int(path.split('.')[1]) == index]
 
-            # Fill in absent contour files with Nones
-            for i, element in enumerate(image_paths):
-                try:
-                    if not contours_paths[i].split('.')[0] == element.split('.')[0]:
+                # Fill in absent contour files with Nones
+                for i, element in enumerate(image_paths):
+                    try:
+                        if not contours_paths[i].split('.')[0] == element.split('.')[0]:
+                            contours_paths.insert(i, None)
+                    except IndexError:
                         contours_paths.insert(i, None)
-                except IndexError:
-                    contours_paths.insert(i, None)
+
+                assert (len(contours_paths) == len(image_paths))
+            else:
+                contours_paths = [None] * len(image_paths)
 
             tags = [self.read_auxiliary(os.path.join(patient_path, patient_auxiliary, path), ct_tags) for path in
                     sorted(os.listdir(os.path.join(patient_path, patient_auxiliary)), key=my_key)]
 
-            assert(len(contours_paths) == len(image_paths))
-            assert(len(tags) == len(image_paths))
+            assert (len(tags) == len(image_paths))
 
             yield Patient(patient_path, contours_paths, image_paths, tags)

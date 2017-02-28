@@ -3,15 +3,14 @@ import numpy as np
 import theano.tensor as t
 import lasagne
 
-conv_0_filters = 32
-conv_1_filters = 64
-conv_2_filters = 128
-conv_3_filters = 256
-conv_4_filters = 1024
+conv_0_filters = 16
+conv_1_filters = 16
+conv_2_filters = 32
+conv_3_filters = 64
+conv_4_filters = 128
 
 network_scale = 8
 total_padding = 32
-
 receptive_field_size = 72
 
 
@@ -38,13 +37,15 @@ def empty_cnn(num_classes, test_mode, batch_size=None, image_size=None, input_va
     if test_mode:
         network = lasagne.layers.pad(network, 2, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_0_filters, filter_size=(5, 5), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_0_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     if test_mode:
         network = lasagne.layers.pad(network, 2, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_0_filters, filter_size=(5, 5), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_0_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     # Max-pooling layer
@@ -54,13 +55,15 @@ def empty_cnn(num_classes, test_mode, batch_size=None, image_size=None, input_va
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_1_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_1_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_1_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_1_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     # Max-pooling layer
@@ -70,13 +73,15 @@ def empty_cnn(num_classes, test_mode, batch_size=None, image_size=None, input_va
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_2_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_2_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_2_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_2_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     # Max-pooling layer
@@ -86,18 +91,21 @@ def empty_cnn(num_classes, test_mode, batch_size=None, image_size=None, input_va
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_3_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_3_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     if test_mode:
         network = lasagne.layers.pad(network, 1, 0.0)
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_3_filters, filter_size=(3, 3), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_3_filters, filter_size=(3, 3),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     # Convolutional layer #4
     network = lasagne.layers.Conv2DLayer(
-        network, num_filters=conv_4_filters, filter_size=(1, 1), nonlinearity=lasagne.nonlinearities.rectify,
+        network, num_filters=conv_4_filters, filter_size=(1, 1),
+        nonlinearity=lasagne.nonlinearities.rectify,
         W=lasagne.init.GlorotUniform(gain=sqrt(2)))
 
     # Final convolutional layer

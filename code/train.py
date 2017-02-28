@@ -54,7 +54,7 @@ def train(weight_src, learning_rate):
     if weight_src is None:
         network = cnn.empty_cnn(num_classes * 2, False, batch_size, image_size, input_var)
     else:
-        network = cnn.file_cnn(weight_src, False, batch_size, image_size, input_var, num_classes)
+        network = cnn.file_cnn(weight_src, False, batch_size, image_size, input_var, num_classes * 2)
     prediction = lasagne.layers.get_output(network)
 
     # Create a loss expression for training (categorical crossentropy)

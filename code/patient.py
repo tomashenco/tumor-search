@@ -14,6 +14,12 @@ class Patient:
         self.__images = images
         self.__tags = tags
 
+    def get_name(self):
+        return self.__main_path.split('/')[-1]
+
+    def get_tags(self):
+        return self.__tags
+
     def get_random_data(self):
         """
         Prepare a pair of image + mask
